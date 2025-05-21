@@ -23,16 +23,16 @@ func SetupDB(envPath string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", os.Getenv(dbUser), os.Getenv(dbPassword), os.Getenv(dbHost), os.Getenv(dbPort), os.Getenv(dbName))
-	return sql.Open("postgres", dbUrl)
+	dbURL := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", os.Getenv(dbUser), os.Getenv(dbPassword), os.Getenv(dbHost), os.Getenv(dbPort), os.Getenv(dbName))
+	return sql.Open("postgres", dbURL)
 }
 
-func SetupDBByUrl(envPath string, dbUrl string) (*sql.DB, error) {
+func SetupDBByURL(envPath string, dbURL string) (*sql.DB, error) {
 	err := godotenv.Load(envPath)
 	if err != nil {
 		return nil, err
 	}
-	return sql.Open("postgres", os.Getenv(dbUrl))
+	return sql.Open("postgres", os.Getenv(dbURL))
 }
 
 func CloseDB(db *sql.DB) {
