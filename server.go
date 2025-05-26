@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 )
 
 func RespondWithError(w http.ResponseWriter, code int, msg string) {
@@ -38,4 +39,30 @@ func CloseResponseBody(response *http.Response) {
 	if err != nil {
 		log.Printf("Failed to close response body: %v", err)
 	}
+}
+
+type loggingResponseWriter struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (lrw *loggingResponseWriter) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
+
+func LoggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		lrw := &loggingResponseWriter{ResponseWriter: w, statusCode: http.StatusOK}
+		start := time.Now()
+		next.ServeHTTP(lrw, r)
+		duration := time.Since(start)
+		log.Printf("[%s] %s %s %d %s",
+			r.Method,
+			r.RemoteAddr,
+			r.URL.Path,
+			lrw.statusCode,
+			duration,
+		)
+	})
 }
