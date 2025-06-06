@@ -17,3 +17,10 @@ func ToNullTime(s string) sql.NullTime {
 	}
 	return sql.NullTime{Time: t, Valid: true}
 }
+
+func NullTimeToString(t sql.NullTime) string {
+	if !t.Valid {
+		return ""
+	}
+	return t.Time.Format(DateFormat)
+}
